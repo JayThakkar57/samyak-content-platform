@@ -260,11 +260,34 @@ async function handle(request, { params }) {
     }
 
     // ============ LESSONS ============
+    async function autoSyncLesson(lessonId, notionUrl, currentTitle) {
+      const apiKey = process.env.NOTION_API_KEY
+      if (!apiKey || !notionUrl) return { synced: false }
+      const pageId = extractNotionPageId(notionUrl)
+      if (!pageId) return { synced: false, error: 'Invalid Notion URL' }
+      try {
+        const notion = new NotionClient({ auth: apiKey })
+        const blocks = await fetchAllChildren(notion, pageId)
+        const title = await fetchPageTitle(notion, pageId)
+        const upd = { notion_page_id: pageId, notion_url: notionUrl, content_json: blocks, last_synced_at: new Date() }
+        if (title && (!currentTitle || currentTitle === 'Untitled Lesson')) upd.title = title
+        await db.collection('lessons').updateOne({ id: lessonId }, { $set: upd })
+        return { synced: true, block_count: blocks.length, title }
+      } catch (e) {
+        return { synced: false, error: e.body?.message || e.message }
+      }
+    }
+
     if (route === '/lessons' && method === 'POST' && isAdmin) {
       const count = await db.collection('lessons').countDocuments({ chapter_id: body.chapter_id })
       const l = { id: uuidv4(), chapter_id: body.chapter_id, title: body.title || 'Untitled Lesson', notion_page_id: null, notion_url: body.notion_url || null, content_json: null, last_synced_at: null, sort_order: body.sort_order ?? count }
       await db.collection('lessons').insertOne(l)
-      const { _id, ...safe } = l; return json(safe)
+      let syncResult = { synced: false }
+      if (body.notion_url) {
+        syncResult = await autoSyncLesson(l.id, body.notion_url, l.title)
+      }
+      const final = await db.collection('lessons').findOne({ id: l.id }, { projection: { _id: 0 } })
+      return json({ ...final, sync_result: syncResult })
     }
     const lessonMatch = route.match(/^\/lessons\/([^/]+)$/)
     if (lessonMatch) {
@@ -284,7 +307,13 @@ async function handle(request, { params }) {
       if (method === 'PATCH' && isAdmin) {
         const upd = {}
         for (const k of ['title','notion_url','sort_order']) if (body[k] !== undefined) upd[k] = body[k]
-        await db.collection('lessons').updateOne({ id }, { $set: upd }); return json({ ok: true })
+        await db.collection('lessons').updateOne({ id }, { $set: upd })
+        let syncResult = { synced: false }
+        if (body.notion_url) {
+          const cur = await db.collection('lessons').findOne({ id })
+          syncResult = await autoSyncLesson(id, body.notion_url, cur?.title)
+        }
+        return json({ ok: true, sync_result: syncResult })
       }
       if (method === 'DELETE' && isAdmin) {
         await db.collection('lessons').deleteOne({ id }); return json({ ok: true })
