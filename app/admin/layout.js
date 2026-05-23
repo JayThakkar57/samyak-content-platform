@@ -2,7 +2,7 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { GraduationCap, LayoutDashboard, BookOpen, Users, LogOut, Loader2 } from 'lucide-react'
+import { GraduationCap, LayoutDashboard, BookOpen, Users, LogOut, Loader2, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const apiFetch = async (path, opts = {}) => {
@@ -45,6 +45,7 @@ export default function AdminLayout({ children }) {
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/programs', label: 'Programs', icon: BookOpen },
     { href: '/admin/students', label: 'Students', icon: Users },
+    { href: '/admin/settings', label: 'Settings', icon: Settings },
   ]
 
   return (

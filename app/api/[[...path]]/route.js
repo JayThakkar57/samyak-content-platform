@@ -127,6 +127,17 @@ async function handle(request, { params }) {
       if (!user) return json({ error: 'Unauthorized' }, 401)
       return json({ user })
     }
+    if (route === '/auth/change-password' && method === 'POST') {
+      const u = await getUser(request)
+      if (!u) return json({ error: 'Unauthorized' }, 401)
+      const { current_password, new_password } = body
+      if (!new_password || new_password.length < 6) return json({ error: 'New password must be at least 6 characters' }, 400)
+      const user = await db.collection('profiles').findOne({ id: u.id })
+      const ok = await bcrypt.compare(current_password || '', user.password_hash || '')
+      if (!ok) return json({ error: 'Current password is incorrect' }, 401)
+      await db.collection('profiles').updateOne({ id: u.id }, { $set: { password_hash: await bcrypt.hash(new_password, 10) } })
+      return json({ ok: true })
+    }
 
     const user = await getUser(request)
     if (!user) return json({ error: 'Unauthorized' }, 401)
