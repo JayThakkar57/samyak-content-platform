@@ -1,6 +1,5 @@
 'use client'
 import React from 'react'
-import { motion } from 'framer-motion'
 
 function renderRichText(arr) {
   if (!arr || !arr.length) return null
@@ -82,13 +81,13 @@ function Block({ block }) {
       const icon = data.icon?.emoji || '💡'
       const color = calloutColors[data.color] || calloutColors.default
       return (
-        <motion.div initial={{ opacity:0, y:10 }} whileInView={{ opacity:1, y:0 }} viewport={{ once: true }} transition={{ duration: 0.4 }} className={`my-4 flex gap-4 rounded-2xl bg-gradient-to-br ${color} border px-5 py-4 shadow-sm`}>
+        <div className={`my-4 flex gap-4 rounded-2xl bg-gradient-to-br ${color} border px-5 py-4 shadow-sm`}>
           <div className="text-2xl leading-none mt-0.5 select-none">{icon}</div>
           <div className="flex-1 text-[16px] leading-[1.7]">
             {renderRichText(data.rich_text)}
             {block.children && <Renderer blocks={block.children} />}
           </div>
-        </motion.div>
+        </div>
       )
     }
     case 'quote':
@@ -117,23 +116,23 @@ function Block({ block }) {
       const lang = data.language || 'text'
       const code = (data.rich_text || []).map(t => t.plain_text).join('')
       return (
-        <motion.div initial={{ opacity:0 }} whileInView={{ opacity:1 }} viewport={{ once: true }} className="my-5 rounded-xl overflow-hidden border border-slate-700 shadow-xl shadow-slate-200">
+        <div className="my-5 rounded-xl overflow-hidden border border-slate-700 shadow-xl shadow-slate-200">
           <div className="bg-slate-800 text-slate-400 text-xs px-4 py-2 border-b border-slate-700 font-mono flex items-center gap-2">
             <div className="flex gap-1.5"><div className="h-2.5 w-2.5 rounded-full bg-red-500/70" /><div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" /><div className="h-2.5 w-2.5 rounded-full bg-green-500/70" /></div>
             <span className="ml-2">{lang}</span>
           </div>
           <pre className="bg-slate-900 text-slate-100 p-5 overflow-x-auto text-sm leading-6 font-mono"><code>{code}</code></pre>
-        </motion.div>
+        </div>
       )
     }
     case 'image': {
       const url = data.type === 'external' ? data.external?.url : data.file?.url
       const caption = (data.caption || []).map(t => t.plain_text).join('')
       return (
-        <motion.figure initial={{ opacity:0, scale:0.96 }} whileInView={{ opacity:1, scale:1 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="my-6">
+        <figure className="my-6">
           {url && <img src={url} alt={caption || 'image'} className="rounded-2xl w-full max-w-3xl shadow-lg shadow-slate-200" />}
           {caption && <figcaption className="text-center text-sm text-slate-500 mt-3 italic">{caption}</figcaption>}
-        </motion.figure>
+        </figure>
       )
     }
     case 'video': {
@@ -141,7 +140,7 @@ function Block({ block }) {
       if (!url) return null
       const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^&?\s]+)/)
       if (yt) {
-        return <motion.div initial={{ opacity:0, scale:0.96 }} whileInView={{ opacity:1, scale:1 }} viewport={{ once: true }} className="my-6 aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xl shadow-slate-200"><iframe src={`https://www.youtube.com/embed/${yt[1]}`} className="w-full h-full" allowFullScreen /></motion.div>
+        return <div className="my-6 aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xl shadow-slate-200"><iframe src={`https://www.youtube.com/embed/${yt[1]}`} className="w-full h-full" allowFullScreen /></div>
       }
       return <video src={url} controls className="my-6 w-full rounded-2xl border border-slate-200 shadow-lg" />
     }
@@ -156,7 +155,7 @@ function Block({ block }) {
     case 'table': {
       const rows = block.children || []
       return (
-        <motion.div initial={{ opacity:0, y:10 }} whileInView={{ opacity:1, y:0 }} viewport={{ once: true }} className="my-6 overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+        <div className="my-6 overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
           <table className="min-w-full text-sm">
             <tbody>
               {rows.map((row, ri) => {
@@ -172,7 +171,7 @@ function Block({ block }) {
               })}
             </tbody>
           </table>
-        </motion.div>
+        </div>
       )
     }
     case 'column_list':
