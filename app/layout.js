@@ -2,8 +2,12 @@ import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 
 export const metadata = {
-  title: 'Samyak — Content Platform',
-  description: 'Premium content delivery platform for Samyak programs',
+  title: 'Samyak — Skilling India',
+  description: 'Premium content delivery platform for Samyak IT Solutions',
+  icons: {
+    icon: '/samyak-logo.png',
+    apple: '/samyak-logo.png',
+  },
 }
 
 export default function RootLayout({ children }) {
