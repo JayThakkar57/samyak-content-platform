@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Loader2, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react'
+import { Loader2, ArrowRight } from 'lucide-react'
 
 function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('admin@samyak.com')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => { fetch('/api/seed', { method: 'POST' }).catch(() => {}) }, [])
@@ -26,64 +26,45 @@ function LoginPage() {
       localStorage.setItem('samyak_token', d.token)
       localStorage.setItem('samyak_role', d.user.role)
       localStorage.setItem('samyak_user', JSON.stringify(d.user))
-      toast.success(`Welcome, ${d.user.name}!`)
+      toast.success(`Welcome, ${d.user.name}`)
       router.push(d.user.role === 'admin' ? '/admin' : '/dashboard')
     } catch (e) { toast.error(e.message) } finally { setLoading(false) }
   }
 
   return (
-    <div className="min-h-screen bg-mesh-blue relative overflow-hidden flex items-center justify-center p-4">
-      {/* Animated background blobs */}
-      <div className="floating-shape animate-float-slow w-96 h-96 bg-blue-500 top-10 left-10" />
-      <div className="floating-shape animate-float-slow w-80 h-80 bg-violet-500 bottom-10 right-10" style={{animationDelay:'2s'}} />
-      <div className="floating-shape animate-float-slow w-64 h-64 bg-pink-500 top-1/2 left-1/2" style={{animationDelay:'4s'}} />
-      
-      {/* Grid overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+    <div className="min-h-screen bg-canvas relative flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-grid opacity-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-stone-50 pointer-events-none" />
 
-      <div className="relative w-full max-w-md">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: 'easeOut' }}>
-          <div className="flex flex-col items-center mb-8">
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="relative mb-6"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-violet-500 blur-2xl opacity-50 animate-pulse-glow" />
-              <img src="/samyak-logo.png" alt="Samyak" className="relative h-28 w-28 rounded-2xl object-cover" />
-            </motion.div>
-            <motion.h1 initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.4}} className="font-display text-4xl font-bold text-white tracking-tight">SaMyaK</motion.h1>
-            <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.5}} className="text-blue-200 text-sm mt-1 font-medium">Skilling India • Since 2013</motion.p>
+      <div className="relative w-full max-w-sm">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
+          <div className="flex flex-col items-center mb-10">
+            <img src="/samyak-logo.png" alt="Samyak" className="h-20 w-20 rounded-2xl object-cover mb-5 animate-subtle-float" />
+            <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">Samyak Computer Classes</h1>
+            <p className="text-slate-500 text-sm mt-1">Surat • Skilling India since 2013</p>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }} className="glass-dark rounded-2xl p-8 shadow-2xl">
-            <div className="flex items-center gap-2 mb-6">
-              <Sparkles className="h-4 w-4 text-blue-300" />
-              <h2 className="text-white text-lg font-semibold">Welcome back</h2>
-            </div>
+          <div className="card-elegant rounded-xl p-7">
+            <h2 className="text-slate-900 text-lg font-semibold mb-1 font-display">Sign in</h2>
+            <p className="text-slate-500 text-sm mb-6">Enter your credentials to access your account</p>
             <form onSubmit={submit} className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-blue-100 text-xs font-medium uppercase tracking-wider">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-300" />
-                  <Input className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200/50 focus:bg-white/20 focus:border-blue-400 h-11" type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
-                </div>
+              <div className="space-y-1.5">
+                <Label className="text-slate-700 text-xs font-medium">Email</Label>
+                <Input className="h-10 bg-stone-50/50 border-slate-200 focus:bg-white focus:border-slate-400" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required autoComplete="off" />
               </div>
-              <div className="space-y-2">
-                <Label className="text-blue-100 text-xs font-medium uppercase tracking-wider">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-300" />
-                  <Input className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200/50 focus:bg-white/20 focus:border-blue-400 h-11" type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
-                </div>
+              <div className="space-y-1.5">
+                <Label className="text-slate-700 text-xs font-medium">Password</Label>
+                <Input className="h-10 bg-stone-50/50 border-slate-200 focus:bg-white focus:border-slate-400" type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" required autoComplete="new-password" />
               </div>
-              <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-400 hover:to-violet-500 text-white font-semibold shadow-lg shadow-blue-500/30 group">
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>Sign in <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition" /></>)}
+              <Button type="submit" disabled={loading} className="w-full h-10 bg-slate-900 hover:bg-slate-800 text-white font-medium mt-2 group">
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>Continue<ArrowRight className="h-3.5 w-3.5 ml-1.5 group-hover:translate-x-0.5 transition" /></>)}
               </Button>
             </form>
-          </motion.div>
+          </div>
 
-          <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.7}} className="text-center text-xs text-blue-300/60 mt-6">Premium content delivery platform • Powered by Notion</motion.p>
+          <p className="text-center text-xs text-slate-400 mt-8">
+            © {new Date().getFullYear()} Samyak Computer Classes — Surat. All rights reserved.
+          </p>
         </motion.div>
       </div>
     </div>
